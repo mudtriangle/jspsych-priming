@@ -1,3 +1,9 @@
+const PRACTICE = true;
+
+const PAIR_CONDITIONS = ['context', 'semantic', 'both', 'unrelated', 'nonobject']
+const PRIME_CONDITIONS = ['real', 'non']
+const PRAC_CONDITIONS = ['prac', 'obj']
+
 var timeline = [];
 
 // Welcome message.
@@ -32,6 +38,46 @@ var instructions_2 = {
     post_trial_gap: 1000
 };
 timeline.push(instructions_2);
+
+// Practice trials.
+if (PRACTICE) {
+    var design = [];
+
+    var practice_message = {
+        type: "html-keyboard-response",
+        stimulus: "<p>There will be a block of practice trials.</p>"
+                  + "<p><i>Press any key to continue.</i></p>",
+    post_trial_gap: 1000
+    };
+    timeline.push(practice_message);
+
+    var practice_trials = {
+        timeline: [
+            {
+                type: "html-keyboard-response",
+                stimulus: function() {
+                    return "<img src='" + jsPsych.timelineVariable('prime_img_path', true) + "'>";
+                },
+                choices: jsPsych.NO_KEYS,
+                trial_duration: 500
+            },
+            {
+                type: "html-keyboard-response",
+                stimulus: function() {
+                    return "<img src='" + jsPsych.timelineVariable('target_img_path', true) + "'>";
+                },
+                choices: ['1', '0']
+            }
+        ],
+        timeline_variables: [
+            {
+                prime_img_path: "img/Prime_" + PAIR_CONDITIONS[0] + "_" + PRAC_CONDITIONS[0] + "_" + String(1) + ".jpg",
+                target_img_path: "img/Target_" + PAIR_CONDITIONS[0] + "_" + PRAC_CONDITIONS[0] + "_" + String(1) + ".jpg"
+            }
+        ]
+    }
+    timeline.push(practice_trials)
+}
 
 // Start.
 jsPsych.init({

@@ -40,6 +40,38 @@ var instructions_2 = {
 timeline.push(instructions_2);
 
 // Practice trials.
+var practice_design = [];
+for (var i = 0; i < 12; i++) {
+    // Populate object_number.
+    if (i < 10) {
+        if (i % 2 == 0) {
+            practice_design.push({object_number: 1});
+        } else {
+            practice_design.push({object_number: 2});
+        }
+    } else if (i == 10) {
+        practice_design.push({object_number: 3});
+    } else if (i == 11) {
+        practice_design.push({object_number: 4});
+    }
+
+    // Populate relation.
+    if (i < 8) {
+        practice_design[i]['relation'] = Math.floor(i / 2);
+    } else {
+        practice_design[i]['relation'] = 4;
+    }
+
+    // Populate corr_resp.
+    if (i < 8) {
+        practice_design[i]['corr_resp'] = 0;
+    } else {
+        practice_design[i]['corr_resp'] = 1;
+    }
+}
+
+console.log(practice_design);
+
 var practice_message = {
     timeline: [
         {
@@ -59,12 +91,17 @@ var practice_trials = {
     timeline: [
         {
             type: "html-keyboard-response",
+            stimulus: "+",
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 500
+        },
+        {
+            type: "html-keyboard-response",
             stimulus: function() {
-                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('pair_cond', true)];
-                prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_cond', true)];
-                num = String(jsPsych.timelineVariable('num', true));
+                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
+                num = String(jsPsych.timelineVariable('object_number', true));
 
-                return "<img src='img/Prime_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
+                return "<img src='img/Prime_" + pair_cond + "_" + PRAC_CONDITIONS[0] + "_" + num + ".jpg'>";
             },
             choices: jsPsych.NO_KEYS,
             trial_duration: 500
@@ -72,22 +109,16 @@ var practice_trials = {
         {
             type: "html-keyboard-response",
             stimulus: function() {
-                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('pair_cond', true)];
-                prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_cond', true)];
-                num = String(jsPsych.timelineVariable('num', true));
+                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
+                num = String(jsPsych.timelineVariable('object_number', true));
                 
-                return "<img src='img/Target_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
+                return "<img src='img/Target_" + pair_cond + "_" + PRAC_CONDITIONS[0] + "_" + num + ".jpg'>";
             },
-            choices: ['1', '0']
+            choices: ['1', '0'],
+            post_trial_gap: 500
         }
     ],
-    timeline_variables: [
-        {
-            pair_cond: 0,
-            prac_cond: 0,
-            num: 1
-        }
-    ],
+    timeline_variables: practice_design,
     conditional_function: function() {
         return PRACTICE;
     }

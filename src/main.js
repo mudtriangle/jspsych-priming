@@ -4,6 +4,8 @@ const PAIR_CONDITIONS = ['context', 'semantic', 'both', 'unrelated', 'nonobject'
 const PRIME_CONDITIONS = ['real', 'non']
 const PRAC_CONDITIONS = ['prac', 'obj']
 
+const MASK = "<img src='img/mask.jpg'>";
+
 var timeline = [];
 
 // Welcome message.
@@ -105,19 +107,65 @@ var practice_trials = {
                 return "<img src='img/Prime_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
             },
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500
+            trial_duration: 100
         },
         {
             type: "html-keyboard-response",
-            stimulus: function() {
-                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
-                prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_condition', true)];
-                num = String(jsPsych.timelineVariable('object_number', true));
-                
-                return "<img src='img/Target_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
-            },
+            stimulus: MASK,
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 200
+        },
+        {
+            type: 'html-keyboard-response',
+            timeline: [
+                {
+                    type: "html-keyboard-response",
+                    stimulus: function() {
+                        pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
+                        prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_condition', true)];
+                        num = String(jsPsych.timelineVariable('object_number', true));
+                        
+                        return "<img src='img/Target_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
+                    },
+                    trial_duration: 100,
+                    on_finish: function(data) {
+                        if (data.key_press == 48 || data.key_press == 49) {
+                            data.key_was_pressed = true;
+                        }
+                    }
+                },
+                {
+                    type: "html-keyboard-response",
+                    stimulus: MASK,
+                    trial_duration: function() {
+                        var key_was_pressed = jsPsych.data.get().last(1).values()[0].key_was_pressed;
+                        if (key_was_pressed) {
+                            return 0;
+                        } else {
+                            return 250;
+                        }
+                    },
+                    on_finish: function(data) {
+                        if (data.key_press == 48 || data.key_press == 49 || this.trial_duration == 0) {
+                            data.key_was_pressed = true;
+                        }
+                    }
+                },
+                {
+                    type: "html-keyboard-response",
+                    stimulus: '',
+                    trial_duration: function() {
+                        var key_was_pressed = jsPsych.data.get().last(1).values()[0].key_was_pressed;
+                        if (key_was_pressed) {
+                            return 0;
+                        } else {
+                            return 5000;
+                        }
+                    }
+                }
+            ],
             choices: ['1', '0'],
-            post_trial_gap: 500
+            response_ends_trial: true
         }
     ],
     timeline_variables: practice_design,
@@ -126,6 +174,7 @@ var practice_trials = {
     }
 };
 timeline.push(practice_trials);
+
 
 var practice_end_message = {
     timeline: [
@@ -194,19 +243,65 @@ var real_trials = {
                 return "<img src='img/Prime_" + prime_cond + "_" + prac_cond + "_" + num + ".jpg'>";
             },
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500
+            trial_duration: 100
         },
         {
             type: "html-keyboard-response",
-            stimulus: function() {
-                pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
-                prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_condition', true)];
-                num = String(jsPsych.timelineVariable('object_number', true));
-                
-                return "<img src='img/Target_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
-            },
+            stimulus: MASK,
+            choices: jsPsych.NO_KEYS,
+            trial_duration: 200
+        },
+        {
+            type: 'html-keyboard-response',
+            timeline: [
+                {
+                    type: "html-keyboard-response",
+                    stimulus: function() {
+                        pair_cond = PAIR_CONDITIONS[jsPsych.timelineVariable('relation', true)];
+                        prac_cond = PRAC_CONDITIONS[jsPsych.timelineVariable('prac_condition', true)];
+                        num = String(jsPsych.timelineVariable('object_number', true));
+                        
+                        return "<img src='img/Target_" + pair_cond + "_" + prac_cond + "_" + num + ".jpg'>";
+                    },
+                    trial_duration: 100,
+                    on_finish: function(data) {
+                        if (data.key_press == 48 || data.key_press == 49) {
+                            data.key_was_pressed = true;
+                        }
+                    }
+                },
+                {
+                    type: "html-keyboard-response",
+                    stimulus: MASK,
+                    trial_duration: function() {
+                        var key_was_pressed = jsPsych.data.get().last(1).values()[0].key_was_pressed;
+                        if (key_was_pressed) {
+                            return 0;
+                        } else {
+                            return 250;
+                        }
+                    },
+                    on_finish: function(data) {
+                        if (data.key_press == 48 || data.key_press == 49 || this.trial_duration == 0) {
+                            data.key_was_pressed = true;
+                        }
+                    }
+                },
+                {
+                    type: "html-keyboard-response",
+                    stimulus: '',
+                    trial_duration: function() {
+                        var key_was_pressed = jsPsych.data.get().last(1).values()[0].key_was_pressed;
+                        if (key_was_pressed) {
+                            return 0;
+                        } else {
+                            return 5000;
+                        }
+                    }
+                }
+            ],
             choices: ['1', '0'],
-            post_trial_gap: 500
+            response_ends_trial: true
         }
     ],
     timeline_variables: real_design
@@ -227,6 +322,6 @@ timeline.push(end_message);
 jsPsych.init({
     timeline: timeline,
     on_finish: function() {
-      jsPsych.data.displayData();
+        jsPsych.data.get().localSave('csv','trial_data.csv');
     }
 });

@@ -8,6 +8,8 @@ const MASK = "<img src='img/mask.jpg'>";
 
 var timeline = [];
 
+var images_to_preload = [];
+
 // Welcome message.
 var welcome = {
     type: "html-keyboard-response",
@@ -70,9 +72,13 @@ for (var i = 0; i < 12; i++) {
     }
 
     practice_design[i]['prac_condition'] = 0;
-}
 
-console.log(practice_design);
+    var pair_cond = PAIR_CONDITIONS[practice_design[i].relation];
+    var prac_cond = PRAC_CONDITIONS[practice_design[i].prac_condition];
+    var num = String(practice_design[i].object_number);
+    images_to_preload.push('img/Prime_' + pair_cond + '_' + prac_cond + '_' + num + '.jpg');
+    images_to_preload.push('img/Target_' + pair_cond + '_' + prac_cond + '_' + num + '.jpg');
+}
 
 var practice_message = {
     timeline: [
@@ -207,7 +213,7 @@ for (var i = 0; i < 120; i++) {
     if (i < 80) {
         real_design[i]['relation'] = Math.floor(i / 20);
     } else {
-        real_design[i]['relation'] = 40;
+        real_design[i]['relation'] = 4;
     }
 
     // Populate corr_resp.
@@ -218,7 +224,19 @@ for (var i = 0; i < 120; i++) {
     }
 
     real_design[i]['prac_condition'] = 1;
+
+    var pair_cond = PAIR_CONDITIONS[real_design[i].relation];
+    if (real_design[i].relation < 4) {
+        var prime_cond = PRIME_CONDITIONS[0];
+    } else {
+        var prime_cond = PRIME_CONDITIONS[1];
+    }
+    var prac_cond = PRAC_CONDITIONS[real_design[i].prac_condition];
+    var num = String(real_design[i].object_number);
+    images_to_preload.push('img/Prime_' + prime_cond + '_' + prac_cond + '_' + num + '.jpg');
+    images_to_preload.push('img/Target_' + pair_cond + '_' + prac_cond + '_' + num + '.jpg');
 }
+real_design = shuffle(real_design);
 
 var real_trials = {
     timeline: [
@@ -321,6 +339,7 @@ timeline.push(end_message);
 // Start.
 jsPsych.init({
     timeline: timeline,
+    preload_images: images_to_preload,
     on_finish: function() {
         jsPsych.data.get().localSave('csv','trial_data.csv');
     }
